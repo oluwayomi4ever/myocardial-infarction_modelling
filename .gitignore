@@ -1,0 +1,357 @@
+# MI Modeling C++ Project - Git Ignore File
+
+# ===========================================
+# Build directories and artifacts
+# ===========================================
+build/
+Build/
+BUILD/
+build-*/
+out/
+bin/
+lib/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+!cmake/*.cmake
+
+# ===========================================
+# Compiled Object files
+# ===========================================
+*.o
+*.obj
+*.lo
+*.slo
+*.ko
+*.elf
+
+# ===========================================
+# Precompiled Headers
+# ===========================================
+*.gch
+*.pch
+
+# ===========================================
+# Compiled Dynamic libraries
+# ===========================================
+*.so
+*.so.*
+*.dylib
+*.dll
+*.dll.a
+
+# ===========================================
+# Static libraries
+# ===========================================
+*.a
+*.la
+*.lib
+
+# ===========================================
+# Executables
+# ===========================================
+*.exe
+*.out
+*.app
+MI_Modeling_Cpp_Project
+mc_model_project
+
+# ===========================================
+# Debug files
+# ===========================================
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# ===========================================
+# IDE and Editor files
+# ===========================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Visual Studio
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# CLion
+.idea/
+cmake-build-*/
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qmlc
+*.jsc
+Makefile*
+*build-*
+*.qm
+*.prl
+
+# Code::Blocks
+*.cbp
+*.layout
+*.depend
+
+# Dev-C++
+*.dev
+
+# Eclipse CDT
+.project
+.cproject
+.settings/
+
+# KDevelop
+.kdev4/
+*.kdev4
+
+# ===========================================
+# Temporary files
+# ===========================================
+*~
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.backup
+*.orig
+*.rej
+
+# ===========================================
+# OS generated files
+# ===========================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+
+# ===========================================
+# Data files (large datasets)
+# ===========================================
+data/raw/
+data/processed/
+data/*.dat
+data/*.csv
+data/*.txt
+data/*.bin
+data/*.h5
+data/*.hdf5
+data/*.nii
+data/*.nii.gz
+data/*.dcm
+data/*.dicom
+data/images/
+data/scans/
+data/clinical/
+
+# Keep data directory structure but ignore contents
+data/*
+!data/.gitkeep
+
+# ===========================================
+# Documentation build artifacts
+# ===========================================
+docs/build/
+docs/_build/
+docs/html/
+docs/latex/
+docs/pdf/
+*.pdf
+*.dvi
+*.aux
+*.log
+*.toc
+*.out
+
+# Doxygen
+docs/html/
+docs/latex/
+
+# ===========================================
+# Testing artifacts
+# ===========================================
+test_results/
+test_output/
+coverage/
+*.gcov
+*.gcno
+*.gcda
+lcov.info
+
+# Google Test
+gtest/
+googletest/
+
+# ===========================================
+# Profiling and performance analysis
+# ===========================================
+*.prof
+*.gprof
+callgrind.out.*
+cachegrind.out.*
+massif.out.*
+valgrind-out.*
+
+# ===========================================
+# Package managers and dependencies
+# ===========================================
+
+# Conan
+conandata.yml
+conanfile.txt
+conaninfo.txt
+conanbuildinfo.*
+conan.lock
+
+# vcpkg
+vcpkg_installed/
+
+# ===========================================
+# Python (if used for scripts)
+# ===========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ===========================================
+# Jupyter Notebooks
+# ===========================================
+.ipynb_checkpoints
+
+# ===========================================
+# Logs
+# ===========================================
+*.log
+logs/
+log/
+
+# ===========================================
+# Configuration files (local settings)
+# ===========================================
+config.local.*
+*.local
+.env.local
+.env.*.local
+
+# ===========================================
+# Archive files
+# ===========================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# ===========================================
+# Large model files and checkpoints
+# ===========================================
+*.model
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+
+# ===========================================
+# Git specific
+# ===========================================
+.gitattributes
+gitignore
+
+# ===========================================
+# Custom project specific
+# ===========================================
+
+# Simulation output files
+simulation_output/
+results/
+output/
+
+# Parameter files (may contain sensitive data)
+parameters/
+params/
+config/
+
+# Backup files
+backup/
+backups/
+
+# Temporary analysis files
+analysis/
+plots/
+figures/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.eps
+*.ps
+
+# Memory dumps
+core
+core.*
+
+# ===========================================
+# Keep important empty directories
+# ===========================================
+
+# Create .gitkeep files for important empty directories
+!data/.gitkeep
+!tests/.gitkeep
+!docs/.gitkeep

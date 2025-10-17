@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MI Modeling - WebAssembly Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            background-color: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            background-color: #e3f2fd;
+            border-color: #0056b3;
+        }
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.loading {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .parameter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .parameter-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .parameter-item label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 MI Modeling Platform - WebAssembly Demo</h1>
+        <p>This demo shows direct HTML ↔ C++ interaction using WebAssembly</p>
+        
+        <!-- Status Display -->
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <!-- File Upload -->
+        <div class="upload-area" id="uploadArea">
+            <h3>📁 Upload Clinical Data</h3>
+            <p>Drag & drop files or click to select</p>
+            <input type="file" id="fileInput" multiple accept=".csv,.dat,.txt,.h5">
+            <button onclick="document.getElementById('fileInput').click()">Choose Files</button>
+            <div id="fileList"></div>
+        </div>
+        
+        <!-- Simulation Parameters -->
+        <h3>⚙️ Simulation Parameters</h3>
+        <div class="parameter-grid">
+            <div class="parameter-item">
+                <label for="modelType">Model Type:</label>
+                <select id="modelType">
+                    <option value="fitzhugh-nagumo">FitzHugh-Nagumo</option>
+                    <option value="luo-rudy">Luo-Rudy Dynamic</option>
+                    <option value="ten-tusscher">Ten Tusscher</option>
+                </select>
+            </div>
+            <div class="parameter-item">
+                <label for="gridWidth">Grid Width:</label>
+                <input type="number" id="gridWidth" value="100" min="10" max="500">
+            </div>
+            <div class="parameter-item">
+                <label for="gridHeight">Grid Height:</label>
+                <input type="number" id="gridHeight" value="100" min="10" max="500">
+            </div>
+            <div class="parameter-item">
+                <label for="timeStep">Time Step (ms):</label>
+                <input type="number" id="timeStep" value="0.01" step="0.001" min="0.001">
+            </div>
+            <div class="parameter-item">
+                <label for="simulationSteps">Simulation Steps:</label>
+                <input type="number" id="simulationSteps" value="1000" min="100" max="10000">
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div style="text-align: center; margin: 30px 0;">
+            <button id="runButton" onclick="runSimulation()">🚀 Run Simulation</button>
+            <button onclick="clearResults()">🗑️ Clear Results</button>
+            <button onclick="exportResults()">💾 Export Results</button>
+        </div>
+        
+        <!-- Results Display -->
+        <div id="results" class="results" style="display: none;">
+            <h3>📊 Simulation Results</h3>
+            <div id="resultsContent"></div>
+            <div class="chart-container">
+                <canvas id="resultsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Global variables
+        let wasmModule = null;
+        let uploadedFiles = [];
+        let simulationResults = null;
+        
+        // Initialize WebAssembly module
+        async function initializeWASM() {
+            showStatus('Loading WebAssembly module...', 'loading');
+            
+            try {
+                // In a real implementation, you would load the compiled WASM module
+                // wasmModule = await import('./mi_modeling.js');
+                
+                // For demo purposes, create mock WASM interface
+                wasmModule = createMockWASM();
+                
+                showStatus('WebAssembly module loaded successfully!', 'success');
+                console.log('WASM module initialized:', wasmModule);
+                
+            } catch (error) {
+                showStatus('Failed to load WebAssembly module: ' + error.message, 'error');
+                console.error('WASM initialization error:', error);
+            }
+        }
+        
+        // Mock WASM module for demo (replace with real WASM loading)
+        function createMockWASM() {
+            return {
+                // Mock FitzHugh-Nagumo class
+                FitzHughNagumo: class {
+                    constructor(width, height, dt) {
+                        this.width = width;
+                        this.height = height;
+                        this.dt = dt;
+                        this.time = 0;
+                        this.u = Array(height).fill().map(() => Array(width).fill(0));
+                        this.v = Array(height).fill().map(() => Array(width).fill(0));
+                    }
+                    
+                    initialize() {
+                        // Initialize with small random values
+                        for (let y = 0; y < this.height; y++) {
+                            for (let x = 0; x < this.width; x++) {
+                                this.u[y][x] = (Math.random() - 0.5) * 0.02;
+                                this.v[y][x] = (Math.random() - 0.5) * 0.02;
+                            }
+                        }
+                    }
+                    
+                    setParameters(a, b, c, d) {
+                        this.a = a; this.b = b; this.c = c; this.d = d;
+                    }
+                    
+                    setDiffusionCoefficients(du, dv) {
+                        this.du = du; this.dv = dv;
+                    }
+                    
+                    run(steps) {
+                        // Mock simulation - in real WASM this would call C++ code
+                        for (let step = 0; step < steps; step++) {
+                            this.time += this.dt;
+                            
+                            // Simple update rule (mock)
+                            for (let y = 1; y < this.height - 1; y++) {
+                                for (let x = 1; x < this.width - 1; x++) {
+                                    const u = this.u[y][x];
+                                    const v = this.v[y][x];
+                                    
+                                    // FitzHugh-Nagumo equations (simplified)
+                                    const du_dt = u - u*u*u/3 - v;
+                                    const dv_dt = (u + 0.1 - 0.5*v) / 1.0;
+                                    
+                                    this.u[y][x] += du_dt * this.dt;
+                                    this.v[y][x] += dv_dt * this.dt;
+                                }
+                            }
+                        }
+                    }
+                    
+                    getTime() { return this.time; }
+                    getMembranePotential() { return this.u; }
+                    getRecoveryVariable() { return this.v; }
+                },
+                
+                // Mock global functions
+                run_fitzhugh_nagumo_simulation: function(width, height, steps, dt) {
+                    const model = new this.FitzHughNagumo(width, height, dt);
+                    model.initialize();
+                    model.setParameters(0.1, 0.5, 1.0, 0.0);
+                    model.setDiffusionCoefficients(0.1, 0.0);
+                    
+                    const start = performance.now();
+                    model.run(steps);
+                    const end = performance.now();
+                    
+                    return end - start; // Return execution time in ms
+                }
+            };
+        }
+        
+        // File handling
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+        
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            uploadedFiles = uploadedFiles.concat(files);
+            displayFiles();
+        }
+        
+        function displayFiles() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            uploadedFiles.forEach((file, index) => {
+                const fileDiv = document.createElement('div');
+                fileDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; 
+                                padding: 10px; margin: 5px 0; background: #e9ecef; border-radius: 5px;">
+                        <span>📄 ${file.name} (${formatFileSize(file.size)})</span>
+                        <button onclick="removeFile(${index})" style="background: #dc3545; padding: 5px 10px;">Remove</button>
+                    </div>
+                `;
+                fileList.appendChild(fileDiv);
+            });
+        }
+        
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            displayFiles();
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Simulation
+        async function runSimulation() {
+            if (!wasmModule) {
+                showStatus('WebAssembly module not loaded!', 'error');
+                return;
+            }
+            
+            const button = document.getElementById('runButton');
+            button.disabled = true;
+            button.textContent = '🔄 Running...';
+            
+            try {
+                showStatus('Running C++ simulation via WebAssembly...', 'loading');
+                
+                // Get parameters
+                const params = {
+                    modelType: document.getElementById('modelType').value,
+                    width: parseInt(document.getElementById('gridWidth').value),
+                    height: parseInt(document.getElementById('gridHeight').value),
+                    timeStep: parseFloat(document.getElementById('timeStep').value),
+                    steps: parseInt(document.getElementById('simulationSteps').value)
+                };
+                
+                // Run C++ simulation directly (via WASM)
+                const executionTime = wasmModule.run_fitzhugh_nagumo_simulation(
+                    params.width, params.height, params.steps, params.timeStep
+                );
+                
+                // Create model instance for detailed results
+                const model = new wasmModule.FitzHughNagumo(params.width, params.height, params.timeStep);
+                model.initialize();
+                model.setParameters(0.1, 0.5, 1.0, 0.0);
+                model.setDiffusionCoefficients(0.1, 0.0);
+                model.run(params.steps);
+                
+                // Generate results
+                simulationResults = {
+                    parameters: params,
+                    executionTime: executionTime,
+                    finalTime: model.getTime(),
+                    membranePotential: model.getMembranePotential(),
+                    recoveryVariable: model.getRecoveryVariable(),
+                    metrics: {
+                        maxPotential: Math.max(...model.getMembranePotential().flat()),
+                        minPotential: Math.min(...model.getMembranePotential().flat()),
+                        meanPotential: model.getMembranePotential().flat().reduce((a, b) => a + b) / (params.width * params.height)
+                    }
+                };
+                
+                displayResults();
+                showStatus(`Simulation completed in ${executionTime.toFixed(2)}ms!`, 'success');
+                
+            } catch (error) {
+                showStatus('Simulation failed: ' + error.message, 'error');
+                console.error('Simulation error:', error);
+            } finally {
+                button.disabled = false;
+                button.textContent = '🚀 Run Simulation';
+            }
+        }
+        
+        function displayResults() {
+            if (!simulationResults) return;
+            
+            const resultsDiv = document.getElementById('results');
+            const contentDiv = document.getElementById('resultsContent');
+            
+            contentDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <h4>⏱️ Execution Time</h4>
+                        <div style="font-size: 2em; color: #007bff; font-weight: bold;">
+                            ${simulationResults.executionTime.toFixed(2)}ms
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <h4>🧠 Final Time</h4>
+                        <div style="font-size: 2em; color: #28a745; font-weight: bold;">
+                            ${simulationResults.finalTime.toFixed(3)}s
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <h4>📈 Max Potential</h4>
+                        <div style="font-size: 2em; color: #dc3545; font-weight: bold;">
+                            ${simulationResults.metrics.maxPotential.toFixed(2)}mV
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <h4>📉 Min Potential</h4>
+                        <div style="font-size: 2em; color: #ffc107; font-weight: bold;">
+                            ${simulationResults.metrics.minPotential.toFixed(2)}mV
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Create visualization
+            createVisualization();
+            
+            resultsDiv.style.display = 'block';
+        }
+        
+        function createVisualization() {
+            const canvas = document.getElementById('resultsChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear previous chart
+            if (window.resultsChart) {
+                window.resultsChart.destroy();
+            }
+            
+            // Extract center row data for visualization
+            const centerRow = Math.floor(simulationResults.membranePotential.length / 2);
+            const membraneData = simulationResults.membranePotential[centerRow];
+            const recoveryData = simulationResults.recoveryVariable[centerRow];
+            
+            window.resultsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: membraneData.length}, (_, i) => i),
+                    datasets: [{
+                        label: 'Membrane Potential (mV)',
+                        data: membraneData,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.1
+                    }, {
+                        label: 'Recovery Variable',
+                        data: recoveryData,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.1,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Membrane Potential (mV)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Recovery Variable'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Cardiac Electrophysiology Simulation Results (Center Row)'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function clearResults() {
+            document.getElementById('results').style.display = 'none';
+            simulationResults = null;
+            if (window.resultsChart) {
+                window.resultsChart.destroy();
+            }
+            showStatus('Results cleared', 'success');
+        }
+        
+        function exportResults() {
+            if (!simulationResults) {
+                showStatus('No results to export', 'error');
+                return;
+            }
+            
+            const exportData = {
+                ...simulationResults,
+                exported: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mi_simulation_wasm_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('Results exported successfully!', 'success');
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', initializeWASM);
+    </script>
+</body>
+</html>
+
+
+

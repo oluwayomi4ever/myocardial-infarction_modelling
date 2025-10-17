@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Classification Test</title>
+</head>
+<body>
+    <h1>Simple Classification Metrics Test</h1>
+    <button onclick="runTest()">Run Test</button>
+    <div id="results"></div>
+
+    <script src="classification_metrics_fixed.js"></script>
+    <script>
+        function runTest() {
+            console.log('=== Starting Simple Test ===');
+            
+            // Create a simple 4x4 grid (16 cells total)
+            const testData = [
+                [0.1, 0.2, 0.3, 0.4],
+                [0.5, 0.6, 0.7, 0.8],
+                [0.9, 1.0, -0.1, -0.2],
+                [-0.3, -0.4, -0.5, -0.6]
+            ];
+            
+            console.log('Test data:', testData);
+            
+            const classifier = new ClassificationMetricsFixed();
+            const result = classifier.analyzeMembranePotential(testData);
+            
+            console.log('Final result:', result);
+            
+            document.getElementById('results').innerHTML = `
+                <h2>Results:</h2>
+                <p>Accuracy: ${result.accuracy}%</p>
+                <p>Precision: ${result.precision}%</p>
+                <p>Recall: ${result.recall}%</p>
+                <p>F1 Score: ${result.f1Score}%</p>
+                <p>TP: ${result.truePositives}, FP: ${result.falsePositives}</p>
+                <p>TN: ${result.trueNegatives}, FN: ${result.falseNegatives}</p>
+            `;
+        }
+    </script>
+</body>
+</html>

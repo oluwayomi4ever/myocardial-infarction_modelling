@@ -1,0 +1,22 @@
+# MI Modeling Platform - Python Dependencies
+
+# Web Framework
+Flask==2.3.3
+Flask-CORS==4.0.0
+
+# Data Processing
+numpy==1.24.3
+pandas==2.0.3
+
+# Medical Imaging (optional)
+# pydicom==2.4.3
+# h5py==3.9.0
+
+# File Processing
+Werkzeug==2.3.7
+
+# Development
+# pytest==7.4.2
+# pytest-flask==1.2.0
+
+

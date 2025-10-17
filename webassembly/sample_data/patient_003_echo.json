@@ -1,0 +1,48 @@
+{
+  "patient_id": "P003",
+  "study_date": "2024-10-17",
+  "patient_info": {
+    "age": 65,
+    "gender": "M",
+    "weight": 78.5,
+    "height": 175.0
+  },
+  "echo_parameters": {
+    "lv_ef": 45.2,
+    "lv_diastolic_volume": 125.8,
+    "lv_systolic_volume": 68.9,
+    "lv_mass": 180.3,
+    "rv_ef": 52.1,
+    "la_volume": 42.7,
+    "ra_volume": 38.2,
+    "e_velocity": 0.65,
+    "a_velocity": 0.82,
+    "e_a_ratio": 0.79,
+    "deceleration_time": 220.5,
+    "ivrt": 95.2,
+    "lateral_e_prime": 0.08,
+    "septal_e_prime": 0.06,
+    "average_e_prime": 0.07,
+    "e_e_prime_ratio": 9.3
+  },
+  "wall_motion": {
+    "anterior_wall": "hypokinetic",
+    "inferior_wall": "normal",
+    "lateral_wall": "normal",
+    "septal_wall": "hypokinetic",
+    "apical_wall": "akinetic"
+  },
+  "valve_assessment": {
+    "mitral_valve": "mild_regurgitation",
+    "aortic_valve": "normal",
+    "tricuspid_valve": "normal",
+    "pulmonary_valve": "normal"
+  },
+  "findings": [
+    "Reduced left ventricular ejection fraction",
+    "Regional wall motion abnormalities",
+    "Diastolic dysfunction grade 2",
+    "Mild mitral regurgitation",
+    "Possible ischemic cardiomyopathy"
+  ]
+}

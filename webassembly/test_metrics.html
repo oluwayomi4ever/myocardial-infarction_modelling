@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Classification Metrics</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <h1>Classification Metrics Test</h1>
+    <button onclick="testMetrics()">Test Classification Metrics</button>
+    <div id="results"></div>
+
+    <script src="classification_metrics_fixed.js?v=1"></script>
+    <script>
+        function testMetrics() {
+            console.log('=== Testing Classification Metrics ===');
+            
+            try {
+                // Test 1: Check if class exists
+                if (typeof ClassificationMetricsFixed === 'undefined') {
+                    throw new Error('ClassificationMetricsFixed class not found');
+                }
+                
+                // Test 2: Create instance
+                const classifier = new ClassificationMetricsFixed();
+                
+                // Test 3: Simple test data
+                const testData = [
+                    [0.1, 0.2, 0.3, 0.4],
+                    [0.5, 0.6, 0.7, 0.8],
+                    [0.9, 1.0, -0.1, -0.2],
+                    [-0.3, -0.4, -0.5, -0.6]
+                ];
+                
+                console.log('Test data:', testData);
+                
+                // Test 4: Run analysis
+                const result = classifier.analyzeMembranePotential(testData);
+                
+                console.log('Result:', result);
+                
+                // Test 5: Check if all required properties exist
+                const requiredProps = ['accuracy', 'precision', 'recall', 'specificity', 'sensitivity', 'f1Score'];
+                const missingProps = requiredProps.filter(prop => result[prop] === undefined);
+                
+                if (missingProps.length > 0) {
+                    throw new Error(`Missing properties: ${missingProps.join(', ')}`);
+                }
+                
+                // Test 6: Check if values are in reasonable range
+                const invalidValues = requiredProps.filter(prop => {
+                    const value = result[prop];
+                    return typeof value !== 'number' || value < 0 || value > 100;
+                });
+                
+                if (invalidValues.length > 0) {
+                    throw new Error(`Invalid values for: ${invalidValues.join(', ')}`);
+                }
+                
+                // Success!
+                document.getElementById('results').innerHTML = `
+                    <div class="result success">
+                        <h3>✅ Test Passed!</h3>
+                        <p><strong>Accuracy:</strong> ${result.accuracy.toFixed(1)}%</p>
+                        <p><strong>Precision:</strong> ${result.precision.toFixed(1)}%</p>
+                        <p><strong>Recall:</strong> ${result.recall.toFixed(1)}%</p>
+                        <p><strong>Specificity:</strong> ${result.specificity.toFixed(1)}%</p>
+                        <p><strong>Sensitivity:</strong> ${result.sensitivity.toFixed(1)}%</p>
+                        <p><strong>F1 Score:</strong> ${result.f1Score.toFixed(1)}%</p>
+                        <p><strong>Confusion Matrix:</strong> TP=${result.truePositives}, FP=${result.falsePositives}, TN=${result.trueNegatives}, FN=${result.falseNegatives}</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Test Failed!</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Stack:</strong> ${error.stack}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            setTimeout(testMetrics, 1000);
+        });
+    </script>
+</body>
+</html>

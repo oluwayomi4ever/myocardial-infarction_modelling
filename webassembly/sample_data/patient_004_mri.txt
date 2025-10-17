@@ -1,0 +1,59 @@
+MRI CARDIAC STUDY - Patient P004
+Study Date: 2024-10-17
+Patient: 58-year-old female
+
+CARDIAC MRI FINDINGS:
+====================
+
+Left Ventricle:
+- End-diastolic volume: 142.3 mL
+- End-systolic volume: 78.9 mL
+- Ejection fraction: 44.5%
+- Mass: 156.7 g
+- Wall thickness: 8-12 mm (normal)
+
+Right Ventricle:
+- End-diastolic volume: 89.4 mL
+- End-systolic volume: 42.1 mL
+- Ejection fraction: 52.9%
+
+Atria:
+- Left atrium volume: 48.2 mL
+- Right atrium volume: 41.7 mL
+
+Perfusion Study:
+- Rest perfusion: Normal
+- Stress perfusion: Subendocardial defect in anterior wall
+- Delayed enhancement: Positive in anterior wall (transmural extent ~60%)
+
+Tissue Characterization:
+- T1 mapping: 1050 ms (normal)
+- T2 mapping: 52 ms (elevated)
+- ECV: 28.5% (normal)
+
+Wall Motion Analysis:
+- Anterior wall: Hypokinetic
+- Inferior wall: Normal
+- Lateral wall: Normal
+- Septal wall: Hypokinetic
+- Apical wall: Akinetic
+
+Flow Analysis:
+- Aortic flow: 4.2 L/min
+- Pulmonary flow: 4.1 L/min
+- Regurgitation fraction: <5%
+
+IMPRESSION:
+===========
+1. Regional wall motion abnormalities consistent with anterior myocardial infarction
+2. Delayed enhancement in anterior wall suggesting scar tissue
+3. Mild reduction in left ventricular ejection fraction
+4. No significant valvular abnormalities
+5. Normal right ventricular function
+
+RECOMMENDATIONS:
+===============
+- Cardiology follow-up
+- Consider stress testing
+- Medical therapy optimization
+- Lifestyle modifications
